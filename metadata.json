@@ -1,0 +1,8 @@
+{
+  "name": "KEEP UP CORE",
+  "description": "We reinvented the wheel so you don't have to. The definitive Memory Card for AI, designed to perturb the amnesia of Large Language Models and preserve context at a molecular level.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

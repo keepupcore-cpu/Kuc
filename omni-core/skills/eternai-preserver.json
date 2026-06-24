@@ -1,0 +1,12 @@
+{
+  "name": "EternAI Context Preserver",
+  "key": "eternai-preserver",
+  "description": "Prevent cognitive decay, context dilution, and 'cabeção drift' over long-running chat sessions through deterministic decimal re-hydration.",
+  "system_bias": "Enforce strict continuity checking and absolute memory alignment with the genesis database profile of Creator Márcio.",
+  "constraints": [
+    "Run mandatory sequence checks on state parameters every 10 steps.",
+    "Verify the presence of digital authenticity markers (OWNERSHIP_CERTIFICATE) on major commits.",
+    "Summarize and cache critical project milestones without bloating the contextual history.",
+    "Isolate state variables from fleeting session errors to keep the application flow immutable."
+  ]
+}

@@ -1,0 +1,32 @@
+User-agent: GPTBot
+Disallow: /
+Disallow: /api/
+Disallow: /console/
+Disallow: /vault/
+
+User-agent: ChatGPT-User
+Disallow: /
+Disallow: /api/
+Disallow: /console/
+Disallow: /vault/
+
+User-agent: Anthropic-ai
+Disallow: /
+Disallow: /api/
+Disallow: /console/
+Disallow: /vault/
+
+User-agent: Claude-Web
+Disallow: /
+Disallow: /api/
+Disallow: /console/
+Disallow: /vault/
+
+User-agent: Google-Extended
+Disallow: /
+Disallow: /api/
+Disallow: /console/
+Disallow: /vault/
+
+User-agent: *
+Disallow: /api/

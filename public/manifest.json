@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "KEEP UP - Context Continuity",
+  "version": "1.0.0",
+  "description": "Sistema de Continuidade de Contexto para IAs (ChatGPT, Claude, Manus).",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Abrir KEEP UP"
+  },
+  "permissions": [
+    "clipboardWrite",
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://claude.ai/*"
+  ]
+}
