@@ -19,13 +19,13 @@ Se você não quiser usar o GitHub, você pode usar o **Netlify CLI** no seu com
 
 > **Nota para Leigos**: O "Arrastar e Soltar" (Netlify Drop) funciona apenas para sites estáticos. Como o **KEEP UP** usa recursos inteligentes do Next.js, ele precisa passar pelo processo de "Build" (construção), que é feito automaticamente no GitHub ou via CLI.
 
-## ⚙️ Configuração da Gemini API (Essencial)
+## ⚙️ Configuração da Groq API (Essencial)
 
-Para que as funções de IA (Extração/Injeção) funcionem no Netlify:
+Para que as funções de IA (Extração/Injeção/OCR) funcionem no Netlify:
 1. No painel do seu site no Netlify, vá em **Site settings** > **Environment variables**.
 2. Clique em **Add a variable** > **Import from .env** ou adicione manualmente:
-   - Key: `GEMINI_API_KEY`
-   - Value: `SUA_CHAVE_AQUI` (Pegue sua chave no AI Studio).
+   - Key: `GROQ_API_KEY`
+   - Value: `SUA_CHAVE_AQUI` (Pegue sua chave no console da Groq: console.groq.com).
 3. **Importante**: Se as variáveis não aparecerem no app, vá em **Deploys** e clique em **"Trigger deploy"** > **"Clear cache and deploy site"**.
 
 ---

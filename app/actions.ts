@@ -1,19 +1,89 @@
 'use server';
 
-import { GoogleGenAI } from '@google/genai';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
+// Helper function to call Groq API natively via Fetch
+async function callGroqAPI(body: any, apiKey: string) {
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Groq API Error [${response.status}]: ${errText}`);
+  }
+
+  return response.json();
+}
+
 export async function validateWithAI(jsonString: string) {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    let parsed: any = null;
+    try {
+      parsed = JSON.parse(jsonString);
+    } catch (e) {
+      // If it fails to parse as JSON, we proceed. It might be invalid JSON validation input.
+    }
+
+    const apiKey = process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY;
     
+    // Check if it's the Omni-Core Test mode from OmniCoreSkillsStudio
+    if (parsed && parsed.mode === 'omni-core-test') {
+      if (!apiKey) {
+        return {
+          items: [
+            "⚙️ [NÚCLEO OMNI-CORE OPERANTE - MODO SIMULAÇÃO DE ALTA FIDELIDADE (OFFLINE)]",
+            `**Análise do Input do Operador:** "${parsed.operatorInput || ''}"`,
+            "",
+            "#### CÓDIGO/RESPOSTA SIMULADA:",
+            "```typescript",
+            "export function processAgnosticSignal(signal: string): boolean {",
+            "  // Código compilado de forma determinística sem lock-in de big tech",
+            "  return signal === 'SOVEREIGN';",
+            "}",
+            "```",
+            "",
+            "*Nota: Conecte sua chave GROQ_API_KEY no menu de segredos para disparar resoluções inteligentes em tempo real através do modelo de ponta.*"
+          ]
+        };
+      }
+
+      // We have the key! Let's execute the actual custom instructions and inputs against Groq!
+      const body = {
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'system',
+            content: parsed.compiledSystemPrompt || 'Você é um assistente Omni-Core altamente preciso.'
+          },
+          {
+            role: 'user',
+            content: parsed.operatorInput || 'Olá'
+          }
+        ],
+        temperature: 0.1
+      };
+
+      const data = await callGroqAPI(body, apiKey);
+      const textResult = data.choices?.[0]?.message?.content || 'Nenhuma resposta gerada.';
+
+      return {
+        items: [
+          "🤖 [NÚCLEO OMNI-CORE OPERANTE - MODELO LLAMA-3.3-70B]",
+          textResult
+        ]
+      };
+    }
+
     // Fallback if API key is not present: Basic validation instead of an error.
     if (!apiKey) {
-      let parsed;
-      try {
-        parsed = JSON.parse(jsonString);
-      } catch (e) {
+      if (!parsed) {
         return {
           level: 'fail',
           label: 'JSON INVÁLIDO',
@@ -33,7 +103,7 @@ export async function validateWithAI(jsonString: string) {
           level: 'warn',
           label: 'VALIDAÇÃO BÁSICA: FALTAM CAMPOS',
           items: [
-            'Chave de API do Gemini não configurada. Usando validação básica.',
+            'Chave de API do Groq não configurada nos Secrets. Usando validação básica.',
             `Campos ausentes: ${missingKeys.join(', ')}`
           ]
         };
@@ -43,14 +113,12 @@ export async function validateWithAI(jsonString: string) {
         level: 'ok',
         label: 'VALIDAÇÃO BÁSICA OK',
         items: [
-          'Chave de API do Gemini não detectada. Usando validação básica (estrutural).',
+          'Chave de API do Groq não detectada. Usando validação básica (estrutural).',
           'A estrutura do JSON está correta com todos os campos principais presentes.'
         ]
       };
     }
 
-    const ai = new GoogleGenAI({ apiKey });
-    
     const prompt = `Você é um Validador de Contexto Crítico para IAs.
 Sua função é analisar o JSON de contexto abaixo e determinar se ele tem qualidade suficiente para que outra IA assuma o projeto sem perder o fio da meada.
 
@@ -82,31 +150,38 @@ Regras para o level:
 - "warn": Faltam detalhes importantes, mas dá para continuar.
 - "fail": Contexto genérico, inútil ou vazio. A próxima IA vai se perder.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-      }
-    });
+    const body = {
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      temperature: 0.1,
+      response_format: { type: 'json_object' }
+    };
 
-    if (!response.text) {
+    const data = await callGroqAPI(body, apiKey);
+    const contentText = data.choices?.[0]?.message?.content || '';
+
+    if (!contentText) {
       throw new Error("Resposta vazia da IA");
     }
 
-    return JSON.parse(response.text);
+    return JSON.parse(contentText);
   } catch (error: any) {
-    console.error("Erro na validação com IA:", error);
+    console.error("Erro na validação com IA (Groq):", error);
     
     // Check if it's an API Key invalid error
-    if (error.message && error.message.includes('API key not valid')) {
+    if (error.message && (error.message.includes('API key not valid') || error.message.includes('401'))) {
       return {
         level: 'fail',
         label: 'CHAVE DE API AUSENTE / INVÁLIDA',
         items: [
-          'A validação inteligente com Gemini não pode ocorrer porque a API Key não foi configurada ou é inválida.',
+          'A validação inteligente com Groq não pode ocorrer porque a API Key do Groq não foi configurada ou é inválida.',
           'No painel do Google AI Studio, vá no menu de configurações ou "Secrets" / "Environment Variables".',
-          'Certifique-se de preencher a variável "NEXT_PUBLIC_GEMINI_API_KEY" com uma chave válida do Google AI Studio.'
+          'Certifique-se de preencher a variável "GROQ_API_KEY" ou "NEXT_PUBLIC_GROQ_API_KEY" com uma chave válida do Groq.'
         ]
       };
     }
@@ -121,7 +196,7 @@ Regras para o level:
 
 export async function runDeterministicForge(compiledPrompt: string, outputType: 'text' | 'image') {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY;
     if (!apiKey) {
       return {
         success: true,
@@ -138,7 +213,6 @@ ${compiledPrompt}
       };
     }
 
-    const ai = new GoogleGenAI({ apiKey });
     const metaPrompt = `Você é um Engenheiro de Prompts Mestre especializado no ecossistema Keep Up Core.
 Sua missão é fundir o objetivo principal do usuário com as diretivas de DETERMINISMO, travas de persistência contra alucinação, constantes físicas e parâmetros de vídeo/shorts especificados no bloco abaixo.
 
@@ -161,14 +235,23 @@ Por favor, forneça o prompt lapidado formatado em Markdown impecável, contendo
 
 Seja direto e prático. Escreva o prompt de forma que o usuário final possa simplesmente copiar e colar cada parte sequencial individualmente de maneira limpa.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: metaPrompt
-    });
+    const body = {
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        {
+          role: 'user',
+          content: metaPrompt
+        }
+      ],
+      temperature: 0.1
+    };
+
+    const data = await callGroqAPI(body, apiKey);
+    const textResult = data.choices?.[0]?.message?.content || 'Sem prompt gerado';
 
     return {
       success: true,
-      text: response.text || "Sem prompt gerado",
+      text: textResult,
       isMock: false
     };
 
@@ -176,7 +259,7 @@ Seja direto e prático. Escreva o prompt de forma que o usuário final possa sim
     console.error("Erro no Forjador Determinístico:", error);
     return {
       success: false,
-      text: "Erro ao contatar o Gemini para polir o prompt: " + error.message,
+      text: "Erro ao contatar o Groq para polir o prompt: " + error.message,
       isMock: true
     };
   }
@@ -224,32 +307,21 @@ export async function getManifests(): Promise<ManifestoFile[]> {
 
 export async function transcribeOcrImages(images: { mimeType: string; base64: string }[]) {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY;
     if (!apiKey) {
       return {
         success: false,
-        error: "Chave de API do Gemini não configurada nos Secrets do Google AI Studio. Por favor, adicione NEXT_PUBLIC_GEMINI_API_KEY."
+        error: "Chave de API do Groq não configurada nos Secrets do Google AI Studio. Por favor, adicione GROQ_API_KEY ou NEXT_PUBLIC_GROQ_API_KEY."
       };
     }
 
-    const ai = new GoogleGenAI({ apiKey });
-    
-    const parts: any[] = [];
-    for (const img of images) {
-      let cleanBase64 = img.base64;
-      if (cleanBase64.includes(';base64,')) {
-        cleanBase64 = cleanBase64.split(';base64,').pop() || '';
-      }
-      parts.push({
-        inlineData: {
-          mimeType: img.mimeType,
-          data: cleanBase64
-        }
-      });
-    }
-
-    parts.push({
-      text: `Você é um Assistente especialista em OCR (Reconhecimento Óptico de Caracteres) de Alta Precisão integrado ao ecossistema Keep Up Core.
+    const messages = [
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: `Você é um Assistente especialista em OCR (Reconhecimento Óptico de Caracteres) de Alta Precisão integrado ao ecossistema Keep Up Core.
 Sua missão é:
 1. Extrair TODO o texto legível contido nas imagens fornecidas (geralmente capturas de tela/prints de conversas, códigos, arquivos de log, prompts ou instruções de outras IAs onde o usuário perdeu o acesso por falta de créditos ou limites).
 2. Agrupar e ordenar o texto de forma cronológica ou lógica para fazer sentido completo.
@@ -258,24 +330,41 @@ Sua missão é:
 5. No final, gerar uma sugestão de Bloco de Injeção JSON do Keep Up Core ou um Prompt de Injeção estruturado para que o usuário copie, cole em outra IA e continue seu trabalho sem amnésia.
 
 Seja extremamente preciso, não resuma ou omita partes importantes do texto original. Ignore ruídos irrelevantes de interface (botões de curtir, avatares, pings de rede, créditos de chat, etc.).`
-    });
+          },
+          ...images.map(img => {
+            let cleanBase64 = img.base64;
+            if (cleanBase64.includes(';base64,')) {
+              cleanBase64 = cleanBase64.split(';base64,').pop() || '';
+            }
+            return {
+              type: "image_url",
+              image_url: {
+                url: `data:${img.mimeType};base64,${cleanBase64}`
+              }
+            };
+          })
+        ]
+      }
+    ];
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: { parts }
-    });
+    const body = {
+      model: "llama-3.2-11b-vision-preview",
+      messages,
+      temperature: 0.1
+    };
+
+    const data = await callGroqAPI(body, apiKey);
+    const textResult = data.choices?.[0]?.message?.content || "Nenhum texto pôde ser extraído das imagens.";
 
     return {
       success: true,
-      text: response.text || "Nenhum texto pôde ser extraído das imagens."
+      text: textResult
     };
   } catch (error: any) {
-    console.error("Erro no OCR com Gemini:", error);
+    console.error("Erro no OCR com Groq:", error);
     return {
       success: false,
       error: error.message || "Erro inesperado ao processar OCR das imagens."
     };
   }
 }
-
-

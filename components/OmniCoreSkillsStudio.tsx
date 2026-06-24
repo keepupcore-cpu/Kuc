@@ -231,61 +231,20 @@ Cole este bloco inteiro na primeira mensagem de qualquer novo chat. A IA orquest
     playPulseSound(800, 'sawtooth', 0.25);
 
     try {
-      // Server action pipeline wrapper
-      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+      // Direct server-side action delegation for security and unified offline fallback
+      const answer = await validateWithAI(JSON.stringify({
+        compiledSystemPrompt,
+        operatorInput,
+        mode: 'omni-core-test'
+      }));
       
-      if (!apiKey) {
-        // High fidelity offline simulation
-        setTimeout(() => {
-          const mockAns = `### ⚙️ [EXECUÇÃO DETERMINÍSTICA COLD-START]
-[NÚCLEO OMNI-CORE OPERANTE - MODO SIMULAÇÃO DE ALTA FIDELIDADE]
-
-**Análise do Input do Operador:** "${operatorInput}"
-**Skills Ativas Utilizadas:** ${skills.filter(s => selectedSkillKeys.includes(s.key)).map(s => s.name).join(', ') || 'Nenhuma'}
-
----
-#### 🧱 CÓDIGO/RESPOSTA EXECUTADA (LEIS DE MÁRCIO):
-\`\`\`typescript
-// Compilado em tempo real com regras livre de lock-in tecnológico
-export function validateHeader(authHeader: string | undefined): { valid: boolean; principal?: string } {
-  if (!authHeader) {
-    return { valid: false };
-  }
-  
-  // Evitar vazamento com validação rígida de formato de token
-  const matches = authHeader.match(/^Bearer\\s+([a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+)$/);
-  if (!matches) {
-    return { valid: false };
-  }
-  
-  const token = matches[1];
-  // Handshake bilateral simulado
-  return { valid: true, principal: "Admin-Sovereign-User" };
-}
-\`\`\`
-
-*Nota: Conecte sua chave GEMINI_API_KEY no menu de segredos para disparar resoluções inteligentes em tempo real através do modelo de ponta.*`;
-          setExecutionResult(mockAns);
-          setIsSimulating(false);
-          playPulseSound(1400, 'sine', 0.2);
-        }, 1500);
+      if (answer && answer.items && answer.items.length > 0) {
+        setExecutionResult(answer.items.join('\n'));
       } else {
-        // API resolution via system actions safely proxied
-        // We'll call are general validating actions or compile them directly
-        const answer = await validateWithAI(JSON.stringify({
-          compiledSystemPrompt,
-          operatorInput,
-          mode: 'omni-core-test'
-        }));
-        
-        if (answer && answer.items && answer.items.length > 0) {
-          setExecutionResult(answer.items.join('\n'));
-        } else {
-          setExecutionResult('Erro ou resposta de formato não mapeado.');
-        }
-        setIsSimulating(false);
-        playPulseSound(1400, 'sine', 0.2);
+        setExecutionResult('Erro ou resposta de formato não mapeado.');
       }
+      setIsSimulating(false);
+      playPulseSound(1400, 'sine', 0.2);
     } catch (err: any) {
       setExecutionResult(`Falha na simulação tática: ${err.message || err}`);
       setIsSimulating(false);

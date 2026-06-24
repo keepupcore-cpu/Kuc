@@ -2336,9 +2336,9 @@ Este documento consolida de forma estrita, encadeada e unificada todos os manife
     setOcrErrorMsg('');
     setOcrResultText('');
     setOcrStatusLogs([
-      '[SISTEMA OCR] Inicializando mecanismo de transcrição gratuito...',
+      '[SISTEMA OCR] Inicializando mecanismo de transcrição agnóstico...',
       `[SISTEMA OCR] Preparando payload de ${ocrImages.length} imagem(ns)...`,
-      '[SISTEMA OCR] Conectando ao Gemini Core para análise multimodal...'
+      '[SISTEMA OCR] Conectando ao Groq (Llama 3.2 Vision) para análise multimodal...'
     ]);
     
     try {
@@ -3917,7 +3917,7 @@ Você DEVE respeitar fielmente as restrições de persistência e travas semânt
         </div>
 
         <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--mono)', lineHeight: '1.6', marginBottom: '24px', background: 'rgba(239,68,68,0.03)', borderLeft: '3px solid #ef4444', padding: '12px 16px' }}>
-          <strong>COMO FUNCIONA:</strong> Tire capturas de tela (prints) de conversas ou prompts presos em sistemas pagos ou limitados. Faça o upload das imagens abaixo. O Gemini analisará os arquivos multimodalmente, extrairá todo o texto de forma estruturada e gerará um prompt pronto para você reiniciar seu trabalho sem amnésia.
+          <strong>COMO FUNCIONA:</strong> Tire capturas de tela (prints) de conversas ou prompts presos em sistemas pagos ou limitados. Faça o upload das imagens abaixo. O Groq (Llama 3.2 Vision) analisará os arquivos de forma 100% agnóstica e multimodal, extrairá todo o texto de forma estruturada e gerará um prompt pronto para você reiniciar seu trabalho sem amnésia.
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginBottom: '32px' }}>
