@@ -1037,7 +1037,7 @@ export default function NexusPage(props: any) {
   const [lang, setLang] = useState<Lang>('pt');
   const t = translations[lang];
 
-  const [localActiveStep, setLocalActiveStep] = useState<number>(0);
+  const [localActiveStep, setLocalActiveStep] = useState<number>(1);
   const activeStep = propActiveStep !== undefined ? propActiveStep : localActiveStep;
   const setActiveStep = (step: number) => {
     if (propSetActiveStep) {
@@ -1120,7 +1120,7 @@ export default function NexusPage(props: any) {
   const [forgeGenLogs, setForgeGenLogs] = useState<string[]>([]);
   const [forgeGeneratedAsset, setForgeGeneratedAsset] = useState<{ type: 'image' | 'text'; imageSrc?: string; textContent?: string } | null>(null);
   const [forgeTargetType, setForgeTargetType] = useState<'image' | 'text'>('image');
-  const [isForgeLocked, setIsForgeLocked] = useState<boolean>(true);
+  const [isForgeLocked, setIsForgeLocked] = useState<boolean>(false);
   const [ytViews, setYtViews] = useState<number>(2500);
   const [ytCpc, setYtCpc] = useState<number>(6.50);
 
@@ -2109,7 +2109,7 @@ Status do Loop: Semente de herança injetada em AGENTS.md. Pronto para monitoram
     }
     if (savedStep) {
       const step = Number(savedStep);
-      setTimeout(() => setActiveStep(isNaN(step) ? 0 : step), 0);
+      setTimeout(() => setActiveStep((isNaN(step) || step === 0 || step === 5) ? 1 : step), 0);
     }
     if (savedSlots) {
       try {
@@ -7991,11 +7991,6 @@ Por favor, responda apenas: 'PROT-E-INI: Gênese assimilada com sucesso. Pronto 
       <div className="hazard-stripes-bg" style={{ position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', width: '95%', maxWidth: '780px', padding: '16px', borderRadius: '8px', zIndex: 10000, display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <div style={{ display: 'flex', gap: '6px', justifyContent: 'space-between' }}>
           
-          <button onClick={() => setActiveStep(0)} className="metal-panel" style={{ flex: 1, padding: '12px 2px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #000', borderColor: activeStep===0 ? '#3b82f6' : '#000', boxShadow: activeStep===0 ? '0 0 15px rgba(59,130,246,0.5), inset 0 0 10px rgba(59,130,246,0.2)' : 'inset 0 2px 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9)' }}>
-            <span style={{ fontSize: '8px', color: '#fff', fontFamily: 'var(--head)', fontWeight: 800, letterSpacing: '1px', marginBottom: '4px' }}>LOUNGE</span>
-            <div style={{ width: '24px', height: '24px', background: 'linear-gradient(180deg, #333, #111)', borderRadius: '4px', border: '1px solid currentColor', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--head)', fontWeight: 900, fontSize: '14px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.2)' }}>0</div>
-          </button>
- 
           <button onClick={() => setActiveStep(1)} className="metal-panel" style={{ flex: 1, padding: '12px 2px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #000', borderColor: activeStep===1 ? '#eab308' : '#000', boxShadow: activeStep===1 ? '0 0 15px rgba(234,179,8,0.5), inset 0 0 10px rgba(234,179,8,0.2)' : 'inset 0 2px 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9)' }}>
             <span style={{ fontSize: '8px', color: '#fff', fontFamily: 'var(--head)', fontWeight: 800, letterSpacing: '1px', marginBottom: '4px' }}>EXTRAIR</span>
             <div style={{ width: '24px', height: '24px', background: 'linear-gradient(180deg, #333, #111)', borderRadius: '4px', border: '1px solid currentColor', color: activeStep===1 ? '#eab308' : '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--head)', fontWeight: 900, fontSize: '14px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.2)' }}>1</div>
@@ -8014,11 +8009,6 @@ Por favor, responda apenas: 'PROT-E-INI: Gênese assimilada com sucesso. Pronto 
           <button onClick={() => setActiveStep(4)} className="metal-panel" style={{ flex: 1, padding: '12px 2px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #000', borderColor: activeStep===4 ? '#ef4444' : '#000', boxShadow: activeStep===4 ? '0 0 15px rgba(239,68,68,0.5), inset 0 0 10px rgba(239,68,68,0.2)' : 'inset 0 2px 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9)' }}>
             <span style={{ fontSize: '8px', color: '#fff', fontFamily: 'var(--head)', fontWeight: 800, letterSpacing: '1px', marginBottom: '4px' }}>CR (OCR)</span>
             <div style={{ width: '24px', height: '24px', background: 'linear-gradient(180deg, #333, #111)', borderRadius: '4px', border: '1px solid currentColor', color: activeStep===4 ? '#ef4444' : '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--head)', fontWeight: 900, fontSize: '14px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.2)' }}>CR</div>
-          </button>
-
-          <button onClick={() => setActiveStep(5)} className="metal-panel" style={{ flex: 1, padding: '12px 2px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #000', borderColor: activeStep===5 ? '#10b981' : '#000', boxShadow: activeStep===5 ? '0 0 15px rgba(16,185,129,0.5), inset 0 0 10px rgba(16,185,129,0.2)' : 'inset 0 2px 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9)' }}>
-            <span style={{ fontSize: '8px', color: '#fff', fontFamily: 'var(--head)', fontWeight: 800, letterSpacing: '1px', marginBottom: '4px' }}>ACADEMY</span>
-            <div style={{ width: '24px', height: '24px', background: 'linear-gradient(180deg, #333, #111)', borderRadius: '4px', border: '1px solid currentColor', color: activeStep===5 ? '#10b981' : '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--head)', fontWeight: 900, fontSize: '14px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.2)' }}>3</div>
           </button>
 
           <button onClick={() => setActiveStep(6)} className="metal-panel" style={{ flex: 1, padding: '12px 2px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #000', borderColor: activeStep===6 ? '#f97316' : '#000', boxShadow: activeStep===6 ? '0 0 15px rgba(249,115,22,0.5), inset 0 0 10px rgba(249,115,22,0.2)' : 'inset 0 2px 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9)' }}>
