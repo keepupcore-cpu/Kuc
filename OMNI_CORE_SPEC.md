@@ -53,8 +53,10 @@ omni-core/
 │   ├── base-adapter.ts     # Wrapper ultra-leve para chamadas brutas (Gemini, OpenAI, Claude)
 │   └── prompt-builder.ts   # Construtor determinístico de cabeçalhos de Skills
 ├── skills/
-│   ├── code-crafter.json   # Modulação para criação de código limpo
-│   └── cyber-defense.json  # Modulação para blindagem e contenção
+│   ├── code-crafter.json        # Modulação para criação de código limpo
+│   ├── cyber-defense.json       # Modulação para blindagem e contenção
+│   ├── eternai-preserver.json   # Protocolo de reidratação e constância de contexto
+│   └── atomic-character-kit.json # Kit visual de personagem: turnaround, expressões, poses e storyboard 5s
 └── registry.ts             # Registrador de microagentes ativos na memória
 ```
 

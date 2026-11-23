@@ -53,6 +53,7 @@ import { translations } from '@/translations';
 import { validateWithAI, runDeterministicForge, getManifests, type ManifestoFile, transcribeOcrImages } from '../actions';
 import { TITAN_MANIFEST } from '@/app/flyer/lib/titan-verification';
 import AvatarStudio from '@/components/AvatarStudio';
+import AtomicCharacterKitStudio from '@/components/AtomicCharacterKitStudio';
 import OmniCoreSkillsStudio from '@/components/OmniCoreSkillsStudio';
 
 type Lang = 'pt' | 'en' | 'es';
@@ -7055,6 +7056,9 @@ Por favor, responda apenas: 'PROT-E-INI: Gênese assimilada com sucesso. Pronto 
 
           {/* ESTÚDIO INTEGRADO DE AVATAR & INSTRUTOR BURACO NEGRO */}
           <AvatarStudio />
+
+          {/* KIT ATÔMICO DE PERSONAGEM (SKILL OMNI-CORE: atomic-character-kit) */}
+          <AtomicCharacterKitStudio />
 
           {/* ESTÚDIO INTEGRADO DE SKILLS DO MOTOR OMNI-CORE */}
           <OmniCoreSkillsStudio />
