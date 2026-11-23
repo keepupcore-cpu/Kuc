@@ -5,11 +5,13 @@ import { SkillSchema } from './adapters/prompt-builder';
 import codeCrafterData from './skills/code-crafter.json';
 import cyberDefenseData from './skills/cyber-defense.json';
 import eternaiPreserverData from './skills/eternai-preserver.json';
+import atomicCharacterKitData from './skills/atomic-character-kit.json';
 
 const STATIC_SKILLS: Record<string, SkillSchema> = {
   'code-crafter': codeCrafterData,
   'cyber-defense': cyberDefenseData,
   'eternai-preserver': eternaiPreserverData,
+  'atomic-character-kit': atomicCharacterKitData,
 };
 
 /**

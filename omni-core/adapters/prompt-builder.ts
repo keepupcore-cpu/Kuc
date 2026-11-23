@@ -4,6 +4,13 @@ export interface SkillSchema {
   description: string;
   system_bias: string;
   constraints: string[];
+  /**
+   * Optional self-contained portable protocol (Markdown) that travels with the
+   * skill and can be copied/downloaded verbatim into any chat. When present it
+   * is injected into the compiled system prompt so the micro-agent inherits the
+   * complete operational protocol, not only the summarized constraints.
+   */
+  portable_text?: string;
 }
 
 /**
@@ -25,11 +32,14 @@ export class OmniCorePromptBuilder {
 
     const skillsSection = activeSkills.map(s => {
       const constraintsList = s.constraints.map(c => `  - [IMPERATIVE]: ${c}`).join('\n');
+      const portableBlock = s.portable_text?.trim()
+        ? `\n- **Protocolo Portátil Completo (injetado literalmente):**\n\n${s.portable_text.trim()}`
+        : '';
       return `### SKILL ID: ${s.key.toUpperCase()} (${s.name})
 - **Descrição:** ${s.description}
 - **Voz/Predisposição:** ${s.system_bias}
 - **Regras de Contenção:**
-${constraintsList}`;
+${constraintsList}${portableBlock}`;
     }).join('\n\n');
 
     const basicConstraints = [
